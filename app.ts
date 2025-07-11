@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import authRoutes from "./src/routes/authRoutes";
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use(cors({
     credentials: true,
 }));
 
-// app.use();
+app.use('api/v1/auth', authRoutes);
 
 export default app;
 
