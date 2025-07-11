@@ -1,6 +1,7 @@
 import Customer from "../models/Customer";
 import {generateAccessToken, generateRefreshToken} from "../utils/generateToken";
 import { error } from "console";
+import jwt, {Secret} from "jsonwebtoken";
 
 export const signUpCustomer = async (req: any, res: any) => {
     const { name, email, passwordHash, phone, address, cartList, loyaltyPoints, isBanned } = req.body;
@@ -67,5 +68,32 @@ export const signInCustomer = async (req: any, res: any) => {
         error(e);
         res.status(500).json({ message: "Internal server error" });
     }
+}
+
+export const refreshToken = async (req: any, res: any) => {
+   const { refreshToken } = req.body;
+
+   if (!refreshToken) {
+       return res.status(401).json({ message: "No refresh token provided" });
+   }
+
+   try {
+       const payload = jwt.verify(
+           refreshToken, process.env.REFRESH_TOKEN as Secret
+       ) as { customerId: string };
+
+       const user = await Customer.findOne({ _id: payload.customerId })
+           .select("email name")
+           .lean();
+       const newAccessToken = generateAccessToken(payload.customerId);
+
+       res.json({
+           user: user,
+           accessToken: newAccessToken
+       });
+   }catch (e){
+       res.status(401).json({ message: "Invalid or expired refresh token" })
+   }
+
 }
 
