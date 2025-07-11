@@ -18,6 +18,10 @@ CustomerSchema.pre<ICustomer>("save", async function (next){
     if (!this.isModified("passwordHash")) return next();
     this.passwordHash = await bcrypt.hash(this.passwordHash, 12);
     next();
-})
+});
+
+CustomerSchema.methods.comparePassword = async function (enteredPassword: string){
+    return await bcrypt.compare(enteredPassword, this.passwordHash);
+};
 
 export default mongoose.model<ICustomer>("Customer", CustomerSchema);

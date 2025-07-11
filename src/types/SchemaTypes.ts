@@ -11,6 +11,7 @@ export interface ICustomer extends Document{
     isBanned: boolean;
     createdAt: Date;
     UpdatedAt: Date;
+    comparePassword(enteredPassword: string): Promise<boolean>;
 }
 
 export interface IBranch extends Document{
